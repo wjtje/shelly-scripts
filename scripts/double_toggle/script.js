@@ -8,7 +8,15 @@ let CONFIG = {
 	}
 };
 
+
 let STORAGE = [];
+
+function clearTimer(id) {
+  if (STORAGE[id].timer != undefined) {
+    Timer.clear(STORAGE[id].timer);
+    STORAGE[id].timer = undefined;
+  }
+}
 
 function emitEvent(id) {
 	let count = STORAGE[id].count;
@@ -56,15 +64,16 @@ function eventHandler(event, userdata) {
 		}
 
 		// Increase count and restart timer
-		Timer.clear(STORAGE[id].timer);
+		clearTimer(id);
 		STORAGE[id].count += 1;
 
 		// Check if the toggle limit has been reached
 		if (
 			CONFIG[id] != undefined &&
-			(CONFIG[id].maxToggleAmount ?? 16) <= STORAGE[id].count
+			(CONFIG[id].maxToggleAmount ?? 16) == STORAGE[id].count
 		) {
 			emitEvent(id);
+			clearTimer(id);
 		} else {
 			STORAGE[id].timer = Timer.set(
 				CONFIG.delay,
