@@ -20,8 +20,6 @@ This scripts emits the status as an event which will showup as an event entity i
 
 ![The script showing up as an event entity inside Home Assistant](../../img/double_toggle_event.png)
 
-![An example automation inside Home Assitant which using the event entity to generate a notification](../../img/double_toggle_automation.png)
-
 ```yaml
 alias: Double Toggle automation
 mode: single
@@ -29,6 +27,10 @@ triggers:
   - trigger: state
     entity_id:
       - event.shellyplusi4_double_toggle_js
+conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != ''unavailable'' }}'
+    alias: Test that the state was not unavailable
 conditions: []
 actions:
   - action: persistent_notification.create
@@ -40,6 +42,7 @@ actions:
         count {{ trigger.to_state.attributes.count }}
 ```
 
+The condition is important, it will make sure that this automation is not execute again when to shelly reconnects to wifi.
 The following automation will generate notification like this:
 
 ![A notification indication that the input has been toggled twice](../../img/double_toggle_notification.png)
